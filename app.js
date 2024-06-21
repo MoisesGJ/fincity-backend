@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.status(200).send("Hey there!");
+  res.status(200).send("Hey there! Welcome to Fincity!!!!");
 });
 
 mongoDB.connect
