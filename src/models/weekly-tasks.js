@@ -33,4 +33,12 @@ const weeklyTaskSchema = new Schema(
 
 const Weekly_Task = mongoose.model('weekly_tasks', weeklyTaskSchema)
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 module.exports = Weekly_Task
+=======
+model.exports = Weekly_Task
+>>>>>>> e2dcf85 (Feat: Weekly Task Model)
+=======
+module.exports = Weekly_Task
+>>>>>>> aa7f35d (Feat: Endpoint get Users)
