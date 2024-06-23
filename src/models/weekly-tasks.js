@@ -33,4 +33,4 @@ const weeklyTaskSchema = new Schema(
 
 const Weekly_Task = mongoose.model('weekly_tasks', weeklyTaskSchema)
 
-model.exports = Weekly_Task
+module.exports = Weekly_Task
