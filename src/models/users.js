@@ -7,8 +7,7 @@ const userSchema = new Schema(
   {
     user: {
       type: String,
-      unique: [true, 'User must be unique'],
-      maxLength: [10, 'First Name cannot have more than 10 characters']
+      maxLength: [10, 'User cannot have more than 10 characters']
     },
     first_name: {
       type: String,
@@ -19,11 +18,10 @@ const userSchema = new Schema(
     last_name: {
       type: String,
       match: [/^[A-Za-z]+$/, 'Only letters allowed.'],
-      maxLength: [50, 'First Name cannot have more than 50 characters']
+      maxLength: [50, 'Last Name cannot have more than 50 characters']
     },
     email: {
-      type: String,
-      unique: [true, 'Email already exists']
+      type: String
     },
     password: {
       type: String,
@@ -51,6 +49,17 @@ const userSchema = new Schema(
     }
   }
 )
+
+userSchema.index({ user: 1, email: 1 }, { unique: true })
+
+userSchema.methods.toJSON = function () {
+  const user = this
+  const userObject = user.toObject()
+
+  delete userObject.password
+
+  return userObject
+}
 
 const User = mongoose.model('users', userSchema)
 
