@@ -5,6 +5,7 @@ const cors = require('cors')
 const port = process.env.PORT
 const mongoDB = require('./src/db/dbConn')
 const user = require('./src/routes/user')
+const tasks = require('./src/routes/tasks')
 
 /**
  * * Middlewares
@@ -19,6 +20,8 @@ app.use(cors())
  */
 
 app.use('/users', user)
+
+app.use('/tasks', tasks)
 
 /**
  * * Start application
