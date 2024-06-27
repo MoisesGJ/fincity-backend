@@ -1,7 +1,7 @@
 const mongoose = require ('mongoose')
 const {Schema} = mongoose
 
-const tasks = new mongoose.Schema(
+const taskSchema = new mongoose.Schema(
     {
         group:{
             type: Schema.Types.ObjectId,
@@ -28,3 +28,6 @@ const tasks = new mongoose.Schema(
         }
     }
 )
+
+const Task= mongoose.model('tasks', taskSchema)
+module.exports=Task

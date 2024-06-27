@@ -1,7 +1,7 @@
 const mongoose = require ('mongoose')
 const {Schema} = mongoose
 
-const studentPurchases = new Schema({
+const studentPurchaseSchema = new mongoose.Schema({
     student:{
         type: Schema.Types.ObjectId,
         ref:'students'
@@ -16,3 +16,6 @@ const studentPurchases = new Schema({
     }
 }
 )
+
+const studentPurchases = mongoose.model('studentPurchases', studentPurchaseSchema)
+module.exports = studentPurchases
