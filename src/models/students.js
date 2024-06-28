@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 const StudentSchema = new Schema({
   first_name: {
@@ -32,8 +32,8 @@ const StudentSchema = new Schema({
     type: Boolean,
     required: true
   }
-});
+})
 
-const Student = mongoose.model('Student', StudentSchema);
+const Student = mongoose.model('Student', StudentSchema)
 
-module.exports = Student;
+module.exports = Student
