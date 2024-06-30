@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 const { Schema } = mongoose
 
 const weeklyTaskSchema = new Schema(
@@ -31,6 +31,6 @@ const weeklyTaskSchema = new Schema(
   }
 )
 
-const Weekly_Task = mongoose.model('weekly_tasks', weeklyTaskSchema)
+const WeeklyTask = mongoose.model('weekly_tasks', weeklyTaskSchema)
 
-module.exports = Weekly_Task
+export default WeeklyTask

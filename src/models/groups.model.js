@@ -1,4 +1,5 @@
-const { Schema, Types, model } = require('mongoose')
+import mongoose from 'mongoose'
+const { Schema, Types, model } = mongoose
 
 const groupsSchema = new Schema({
   school: {
@@ -29,4 +30,4 @@ const groupsSchema = new Schema({
 
 const Group = model('groups', groupsSchema)
 
-module.exports = Group
+export default Group

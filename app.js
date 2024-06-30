@@ -1,34 +1,33 @@
-require('dotenv').config()
-const express = require('express')
+import dotenv from 'dotenv'
+import express from 'express'
+import cors from 'cors'
+import { connect } from './src/db/dbConn.js'
+import userRoutes from './src/routes/users.router.js'
+
+dotenv.config()
+
 const app = express()
-const cors = require('cors')
 const port = process.env.PORT
-const mongoDB = require('./src/db/dbConn')
-const user = require('./src/routes/user')
 
 /**
- * * Middlewares
+ * Middlewares
  */
-
 app.use(express.json())
-
 app.use(cors())
 
 /**
- * * URIs
+ * URIs
  */
-
-app.use('/users', user)
+app.use('/users', userRoutes)
 
 /**
- * * Start application
+ * Start application
  */
-
 app.get('/', (req, res) => {
   res.status(200).send('Hey there! Welcome to Fincity!!!!')
 })
 
-mongoDB.connect
+connect()
   .then((message) => {
     console.log(message)
     app.listen(port, () => {

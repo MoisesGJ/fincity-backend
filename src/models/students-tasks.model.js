@@ -1,4 +1,5 @@
-const { Schema, Types, model } = require('mongoose')
+import mongoose from 'mongoose'
+const { Schema, Types, model } = mongoose
 
 const studentsTasksSchema = new Schema({
   student: {
@@ -19,4 +20,4 @@ const studentsTasksSchema = new Schema({
 
 const StudentTasks = model('students_tasks', studentsTasksSchema)
 
-module.exports = StudentTasks
+export default StudentTasks

@@ -1,4 +1,5 @@
-const { Schema, model } = require('mongoose')
+import mongoose from 'mongoose'
+const { Schema, model } = mongoose
 
 const schoolSchema = new Schema({
   school_name: {
@@ -13,4 +14,4 @@ const schoolSchema = new Schema({
 
 const School = model('schools', schoolSchema)
 
-module.exports = School
+export default School
