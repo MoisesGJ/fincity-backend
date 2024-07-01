@@ -9,6 +9,7 @@ import tasksRoutes from './src/routes/tasks.router.js'
 import purchaseItemRoutes from './src/routes/purchases-items.router.js'
 import groupsRoutes from './src/routes/groups.router.js'
 import schoolsRoutes from './src/routes/schools.router.js'
+import studentsTasksRoutes from './src/routes/students-tasks.router.js'
 
 dotenv.config()
 
@@ -30,6 +31,7 @@ app.use('/tasks', tasksRoutes)
 app.use('/items/purchases', purchaseItemRoutes)
 app.use('/groups', groupsRoutes)
 app.use('/schools', schoolsRoutes)
+app.use('/students-tasks', studentsTasksRoutes)
 
 /**
  * Start application
