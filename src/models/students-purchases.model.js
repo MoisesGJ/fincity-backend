@@ -17,7 +17,7 @@ const studentPurchasesSchema = new Schema({
 })
 
 const StudentPurchase = mongoose.model(
-  'studentPurchases',
+  'students_purchases',
   studentPurchasesSchema
 )
 

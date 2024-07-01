@@ -2,7 +2,13 @@ import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import { connect } from './src/db/dbConn.js'
+
 import userRoutes from './src/routes/users.router.js'
+import studentsRoutes from './src/routes/students.router.js'
+import tasksRoutes from './src/routes/tasks.router.js'
+import purchaseItemRoutes from './src/routes/purchases-items.router.js'
+import groupsRoutes from './src/routes/groups.router.js'
+import schoolsRoutes from './src/routes/schools.router.js'
 
 dotenv.config()
 
@@ -19,6 +25,11 @@ app.use(cors())
  * URIs
  */
 app.use('/users', userRoutes)
+app.use('/students', studentsRoutes)
+app.use('/tasks', tasksRoutes)
+app.use('/items/purchases', purchaseItemRoutes)
+app.use('/groups', groupsRoutes)
+app.use('/schools', schoolsRoutes)
 
 /**
  * Start application

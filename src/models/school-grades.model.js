@@ -2,13 +2,13 @@ import mongoose from 'mongoose'
 const { Schema } = mongoose
 
 const schoolGradeSchema = new Schema({
-  grade: {
+  description: {
     type: String,
     required: true,
     maxLength: 30
   }
 })
 
-const SchoolGrade = mongoose.model('schoolGrades', schoolGradeSchema)
+const SchoolGrade = mongoose.model('school_grades', schoolGradeSchema)
 
 export default SchoolGrade

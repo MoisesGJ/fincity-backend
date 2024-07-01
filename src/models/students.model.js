@@ -1,40 +1,60 @@
 import mongoose from 'mongoose'
+import User from './users.model.js'
+import Group from './groups.model.js'
+import Avatar from './avatars.model.js'
 
-const { Schema } = mongoose
+const { Schema, Types } = mongoose
 
 const StudentSchema = new Schema({
-  first_name: {
-    type: String,
-    maxlength: 50,
-    required: true
+  group: {
+    type: Types.ObjectId,
+    ref: 'Group',
+    required: [true, 'El grupo es obligatorio'],
+    validate: {
+      validator: async function (groupId) {
+        const group = await Group.findById(groupId)
+        return !!group
+      },
+      message: 'Group does not exist'
+    }
   },
-  last_name: {
-    type: String,
-    maxlength: 50,
-    required: true
+  student: {
+    type: Types.ObjectId,
+    ref: 'User',
+    required: [true, 'El estudiante es obligatorio'],
+    validate: {
+      validator: async function (studentId) {
+        const student = await User.findById(studentId)
+        return !!student
+      },
+      message: 'Student does not exist'
+    }
   },
-  email: {
-    type: String,
-    maxlength: 100,
-    required: true,
-    unique: true
+  parent: {
+    type: Types.ObjectId,
+    ref: 'User',
+    required: [true, 'El padre es obligatorio'],
+    validate: {
+      validator: async function (parentId) {
+        const parent = await User.findById(parentId)
+        return !!parent
+      },
+      message: 'Parent does not exist'
+    }
   },
-  school: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'School',
-    required: true
-  },
-  grade: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Grade',
-    required: true
-  },
-  status: {
-    type: Boolean,
-    required: true
+  avatar: {
+    type: Types.ObjectId,
+    ref: 'Avatar',
+    validate: {
+      validator: async function (avatarId) {
+        const avatar = await Avatar.findById(avatarId)
+        return !!avatar
+      },
+      message: 'Avatar does not exist'
+    }
   }
 })
 
-const Student = mongoose.model('Student', StudentSchema)
+const Student = mongoose.model('students', StudentSchema)
 
 export default Student

@@ -33,6 +33,6 @@ const PurchaseItemSchema = new Schema({
   }
 })
 
-const PurchaseItem = mongoose.model('PurchaseItem', PurchaseItemSchema)
+const PurchaseItem = mongoose.model('purchase_items', PurchaseItemSchema)
 
 export default PurchaseItem
