@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import mongoose from 'mongoose'
+
+const { Schema } = mongoose
 
 const PurchaseItemSchema = new Schema({
   Group: {
@@ -30,8 +31,8 @@ const PurchaseItemSchema = new Schema({
     type: Boolean,
     required: true
   }
-});
+})
 
-const PurchaseItem = mongoose.model('PurchaseItem', PurchaseItemSchema);
+const PurchaseItem = mongoose.model('purchase_items', PurchaseItemSchema)
 
-module.exports = PurchaseItem;
+export default PurchaseItem
