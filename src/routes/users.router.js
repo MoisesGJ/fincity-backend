@@ -47,4 +47,27 @@ router.post('/', async (request, response) => {
   }
 })
 
+router.post('/login', async (req, res) => {
+  try {
+    const { user, email, password } = req.body
+
+    const { token, userId } = await users.login({ user, email, password })
+
+    res.status(200).send({
+      message: 'Login Successful',
+      data: {
+        token,
+        userId
+      }
+    })
+  } catch (error) {
+    console.error(error)
+
+    res.status(error.status || 400).send({
+      message: 'Something went wrong',
+      error: error.message || 'Error: Please contact your System Administrator'
+    })
+  }
+})
+
 export default router

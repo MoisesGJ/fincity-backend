@@ -44,10 +44,44 @@ async function update(id, newdata) {
   return userupdated
 }
 
+async function login({ user, email, password }) {
+  if ((!email && !user) || !password) {
+    throw new createError(400, 'Email or User, and Password are Required')
+  }
+
+  const userToLogin = await User.findOne({
+    $or: [{ email: email || '' }, { user: user || '' }]
+  })
+
+  console.log(userToLogin)
+  if (!userToLogin) {
+    throw new createError(401, 'Invalid credentials')
+  }
+
+  const isPasswordValid = await User.isValidPassword(
+    password,
+    userToLogin.password
+  )
+  if (!isPasswordValid) {
+    throw new createError(401, 'Invalid credentials')
+  }
+
+  const token = await User.createToken({
+    _id: userToLogin._id,
+    first_name: userToLogin.first_name
+  })
+
+  return {
+    token,
+    userId: userToLogin._id
+  }
+}
+
 export default {
   getAll,
   create,
   getById,
   deleteById,
-  update
+  update,
+  login
 }
