@@ -6,13 +6,9 @@ const studentPurchaseSchema = new mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: 'students'
   },
-  weekly_task: {
+  purchase: {
     type: Schema.Types.ObjectId,
-    ref: 'weekly-tasks'
-  },
-  status: {
-    type: Boolean,
-    required: true
+    ref: 'purchases-items'
   }
 })
 
