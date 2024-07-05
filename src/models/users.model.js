@@ -17,20 +17,13 @@ const userSchema = new Schema(
     first_name: {
       type: String,
       required: [true, 'First Name is required'],
-      match: [
-        /^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$/,
-        'First Name can only contain letters and spaces.'
-      ],
+
       maxLength: [50, 'First Name cannot have more than 50 characters'],
       trim: true
     },
     last_name: {
       type: String,
       required: [true, 'Last Name is required'],
-      match: [
-        /^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$/,
-        'Last Name can only contain letters and spaces.'
-      ],
       maxLength: [50, 'Last Name cannot have more than 50 characters'],
       trim: true
     },
