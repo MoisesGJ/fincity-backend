@@ -1,24 +1,24 @@
 import jwt from 'jsonwebtoken'
 
-export default async function validUser(req, res, next) {
+export default async function validTokenEmail(req, res, next) {
   try {
-    const { authorization } = req.headers
+    const { authentication } = req.headers
 
-    if (!authorization) {
+    if (!authentication) {
+      console.log('No header')
       return res.status(401).send({
         error: {
-          message: 'No auth provider'
+          message: 'Token is not provided'
         }
       })
     }
 
-    const token = authorization.split(' ')[1]
-    jwt.verify(token, process.env.JWT_SIGN, (err, payload) => {
+    const token = authentication.split(' ')[1]
+    jwt.verify(token, process.env.TOKEN_EMAIL_SECRET, (err, payload) => {
       if (err) {
         return res.status(403).json({
-          expireSess: true,
           error: {
-            message: 'Invalid auth'
+            message: 'Invalid token email'
           }
         })
       } else {

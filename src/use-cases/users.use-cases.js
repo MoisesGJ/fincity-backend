@@ -1,6 +1,15 @@
 import User from '../models/users.model.js'
 import mongoose from 'mongoose'
 import createError from 'http-errors'
+import { Resend } from 'resend'
+
+import JWT from '../lib/jsonwebtoken.js'
+import templateHtml from '../lib/email/email-template.html.js'
+
+async function getByEmail(emailUser) {
+  const userExists = await User.findOne({ email: emailUser })
+  return userExists
+}
 
 async function getAll() {
   const allUsers = await User.find()
@@ -44,6 +53,13 @@ async function update(id, newdata) {
   return userupdated
 }
 
+async function createToken(id, name) {
+  return await User.createToken({
+    _id: id,
+    first_name: name
+  })
+}
+
 async function login({ user, email, password }) {
   if ((!email && !user) || !password) {
     throw new createError(400, 'Email or User, and Password are Required')
@@ -53,7 +69,6 @@ async function login({ user, email, password }) {
     $or: [{ email: email || '' }, { user: user || '' }]
   })
 
-  console.log(userToLogin)
   if (!userToLogin) {
     throw new createError(401, 'Invalid credentials')
   }
@@ -66,22 +81,64 @@ async function login({ user, email, password }) {
     throw new createError(401, 'Invalid credentials')
   }
 
-  const token = await User.createToken({
-    _id: userToLogin._id,
-    first_name: userToLogin.first_name
+  const token = await createToken(userToLogin._id, userToLogin.first_name)
+
+  const userResponse = {
+    id: userToLogin._id,
+    user: userToLogin.user,
+    emailVerified: userToLogin.emailVerified,
+    first_name: userToLogin.first_name,
+    last_name: userToLogin.last_name,
+    role: userToLogin.role,
+    token
+  }
+  console.log('user', userResponse)
+
+  return userResponse
+}
+
+async function validate(id) {
+  const user = await getById(id)
+
+  if (user) return await update(id, { emailVerified: true })
+}
+
+async function magicLink(baseUrl, idUser) {
+  const token = JWT.generateAccessToken(idUser)
+
+  return `${baseUrl}/auth/verification/${token}`
+}
+
+async function sendEmail(baseUrl, idUser) {
+  const userToEmail = await getById(idUser)
+
+  const resend = new Resend(process.env.EMAIL_RESEND_API)
+
+  const link = await magicLink(baseUrl, idUser)
+
+  const { data, error } = await resend.emails.send({
+    from: `FinCity <${process.env.EMAIL_RESEND_FROM}>`,
+    to: [userToEmail.email],
+    subject: 'Empieza por aquí...',
+    html: templateHtml(link)
   })
 
-  return {
-    token,
-    userId: userToLogin._id
+  if (error) {
+    throw new Error({ error: error.message })
   }
+
+  return data
 }
 
 export default {
+  getByEmail,
   getAll,
   create,
   getById,
   deleteById,
   update,
-  login
+  createToken,
+  login,
+  validate,
+  sendEmail
 }

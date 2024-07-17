@@ -35,6 +35,10 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true
     },
+    emailVerified: {
+      type: Boolean,
+      default: false
+    },
     password: {
       type: String,
       required: [true, 'Password is required'],
@@ -56,13 +60,7 @@ const userSchema = new Schema(
     googleId: {
       type: String,
       unique: true,
-      trim: true,
-      sparse: true
-    },
-    googleToken: {
-      type: String,
-      trim: true,
-      sparse: true
+      trim: true
     }
   },
   {
