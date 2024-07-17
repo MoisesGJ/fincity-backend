@@ -92,7 +92,6 @@ async function login({ user, email, password }) {
     role: userToLogin.role,
     token
   }
-  console.log('user', userResponse)
 
   return userResponse
 }
