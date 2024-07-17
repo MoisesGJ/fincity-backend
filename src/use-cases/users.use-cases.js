@@ -111,6 +111,8 @@ async function magicLink(baseUrl, idUser) {
 async function sendEmail(baseUrl, idUser) {
   const userToEmail = await getById(idUser)
 
+  if (userToEmail.emailVerified) throw new Error('El correo ya está validado')
+
   const resend = new Resend(process.env.EMAIL_RESEND_API)
 
   const link = await magicLink(baseUrl, idUser)
