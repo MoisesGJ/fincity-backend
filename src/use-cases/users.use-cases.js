@@ -6,9 +6,34 @@ import { Resend } from 'resend'
 import JWT from '../lib/jsonwebtoken.js'
 import templateHtml from '../lib/email/email-template.html.js'
 
+async function createToken(id, name) {
+  return await User.createToken({
+    _id: id,
+    first_name: name
+  })
+}
+
 async function getByEmail(emailUser) {
   const userExists = await User.findOne({ email: emailUser })
   return userExists
+}
+
+async function getByAccessToken(accessToken) {
+  const userExists = await User.findOne({ googleId: accessToken })
+
+  const token = await createToken(userExists._id, userExists.first_name)
+
+  const userResponse = {
+    id: userExists._id,
+    user: userExists.user,
+    emailVerified: userExists.emailVerified,
+    first_name: userExists.first_name,
+    last_name: userExists.last_name,
+    role: userExists.role,
+    token
+  }
+
+  return userResponse
 }
 
 async function getAll() {
@@ -53,13 +78,6 @@ async function update(id, newdata) {
   return userupdated
 }
 
-async function createToken(id, name) {
-  return await User.createToken({
-    _id: id,
-    first_name: name
-  })
-}
-
 async function login({ user, email, password }) {
   if ((!email && !user) || !password) {
     throw new createError(400, 'Email or User, and Password are Required')
@@ -68,6 +86,8 @@ async function login({ user, email, password }) {
   const userToLogin = await User.findOne({
     $or: [{ email: email || '' }, { user: user || '' }]
   })
+
+  if (userToLogin.googleId) throw new createError(401, 'Invalid credentials')
 
   if (!userToLogin) {
     throw new createError(401, 'Invalid credentials')
@@ -133,6 +153,7 @@ async function sendEmail(baseUrl, idUser) {
 
 export default {
   getByEmail,
+  getByAccessToken,
   getAll,
   create,
   getById,

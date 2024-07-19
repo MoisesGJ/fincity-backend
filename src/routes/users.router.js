@@ -75,6 +75,34 @@ router.get('/email/:email', async (request, response) => {
   }
 })
 
+// GET /users/access-token/
+router.get('/access-token/:accessToken', async (request, response) => {
+  try {
+    const userData = request.params
+    const user = await users.getByAccessToken(userData.accessToken)
+
+    if (user) {
+      response.json({
+        message: 'Users exists',
+        ok: true,
+        data: {
+          user
+        }
+      })
+    } else {
+      response.json({
+        message: 'User doesnt exists',
+        ok: false
+      })
+    }
+  } catch (error) {
+    response.status(500).json({
+      message: 'Something went wrong',
+      error: error.message
+    })
+  }
+})
+
 // POST /users
 router.post('/', async (request, response) => {
   try {
@@ -105,11 +133,12 @@ router.post('/', async (request, response) => {
 
 //PATCH /user/id
 
-router.patch('/:id', async (request, response) => {
+router.patch('/google/:id', async (request, response) => {
   try {
     const newdata = request.body
     const { id } = request.params
 
+    console.log(newdata)
     if (!newdata || Object.keys(newdata).length === 0) {
       return response.status(400).json({
         message: 'No data to update'

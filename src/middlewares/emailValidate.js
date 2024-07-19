@@ -8,7 +8,7 @@ export default async function validTokenEmail(req, res, next) {
       console.log('No header')
       return res.status(401).send({
         error: {
-          message: 'Token is not provided'
+          message: 'Necesitas enviar un token'
         }
       })
     }
@@ -18,7 +18,7 @@ export default async function validTokenEmail(req, res, next) {
       if (err) {
         return res.status(403).json({
           error: {
-            message: 'Invalid token email'
+            message: 'El token no es válido'
           }
         })
       } else {
