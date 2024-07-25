@@ -6,26 +6,6 @@ import validUser from '../middlewares/userauth.js'
 
 const router = express.Router()
 
-// GET /users
-/*router.get('/', async (request, response) => {
-  try {
-    const allUsers = await users.getAll()
-
-    response.json({
-      message: 'Users list',
-      ok: true,
-      data: {
-        users: allUsers
-      }
-    })
-  } catch (error) {
-    response.status(500).json({
-      message: 'Something went wrong',
-      error: error.message
-    })
-  }
-})*/
-
 // GET /users/id
 router.get('/:id', async (request, response) => {
   try {
@@ -78,8 +58,9 @@ router.get('/email/:email', async (request, response) => {
 // GET /users/access-token/
 router.get('/access-token/:accessToken', async (request, response) => {
   try {
-    const userData = request.params
-    const user = await users.getByAccessToken(userData.accessToken)
+    const { accessToken } = request.params
+
+    const user = await users.getByAccessToken(accessToken)
 
     if (user) {
       response.json({
@@ -111,17 +92,17 @@ router.post('/', async (request, response) => {
     const newUser = await users.create(userData)
     const token = await users.createToken(newUser._id, newUser.first_name)
 
+    console.log({ ...newUser, token: token })
+
     response.status(201)
     response.json({
       message: 'User created',
       ok: true,
       data: {
-        user: { token, ...newUser }
+        user: { ...newUser, token: token }
       }
     })
   } catch (error) {
-    console.log(error.message)
-
     response.status(error.name === 'ValidationError' ? 400 : 500)
 
     response.json({
@@ -138,7 +119,6 @@ router.patch('/google/:id', async (request, response) => {
     const newdata = request.body
     const { id } = request.params
 
-    console.log(newdata)
     if (!newdata || Object.keys(newdata).length === 0) {
       return response.status(400).json({
         message: 'No data to update'
@@ -153,7 +133,6 @@ router.patch('/google/:id', async (request, response) => {
       data: { user }
     })
   } catch (error) {
-    console.log(error.status)
     response.status(error.status || 500).json({
       message: 'something went wrong',
       error: error.message
