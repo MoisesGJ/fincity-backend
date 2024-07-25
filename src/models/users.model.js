@@ -10,9 +10,7 @@ const userSchema = new Schema(
     user: {
       type: String,
       maxLength: [10, 'User cannot have more than 10 characters'],
-      unique: true,
-      trim: true,
-      default: null
+      trim: true
     },
     first_name: {
       type: String,
@@ -29,8 +27,6 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      required: [true, 'Email is required'],
-      unique: true,
       match: [/\S+@\S+\.\S+/, 'Email is invalid'],
       lowercase: true,
       trim: true
@@ -45,18 +41,20 @@ const userSchema = new Schema(
       minLength: [8, 'Password must be at least 8 characters long'],
       trim: true
     },
-    role: {
-      type: Schema.Types.ObjectId,
-      ref: 'Role',
-      required: [true, 'Role is required'],
-      validate: {
-        validator: async function (roleId) {
-          const role = await Role.findById(roleId)
-          return !!role
-        },
-        message: 'Role does not exist'
+    role: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'roles',
+        required: [true, 'Role is required'],
+        validate: {
+          validator: async function (roleId) {
+            const role = await Role.findById(roleId)
+            return !!role
+          },
+          message: 'Role does not exist'
+        }
       }
-    },
+    ],
     googleId: {
       type: String,
       unique: true,
@@ -81,7 +79,14 @@ const userSchema = new Schema(
   }
 )
 
-userSchema.index({ user: 1, email: 1 }, { unique: true })
+userSchema.index(
+  { user: 1 },
+  { unique: true, partialFilterExpression: { user: { $type: 'string' } } }
+)
+userSchema.index(
+  { email: 1 },
+  { unique: true, partialFilterExpression: { email: { $type: 'string' } } }
+)
 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next()
@@ -91,6 +96,13 @@ userSchema.pre('save', async function (next) {
   } catch (error) {
     next(error)
   }
+})
+
+userSchema.pre('save', async function (next) {
+  if (!this.user && !this.email) {
+    next(new Error('Either User or Email must be provided'))
+  }
+  next()
 })
 
 userSchema.methods.toJSON = function () {

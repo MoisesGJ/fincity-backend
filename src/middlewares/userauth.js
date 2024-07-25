@@ -27,6 +27,7 @@ export default async function validUser(req, res, next) {
       }
     })
   } catch (error) {
+    console.log(error)
     const tokenError = new Error(error)
 
     res.status(400).send({

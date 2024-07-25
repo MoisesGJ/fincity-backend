@@ -229,4 +229,75 @@ router.post('/validate-email', validTokenEmailMiddleware, async (req, res) => {
   }
 })
 
+// # CREATE
+// POST users/students/
+router.post('/students', express.text(), validUser, async (req, res) => {
+  try {
+    const id = req.user._id
+    const arr = req.body
+    const studentsGroup = JSON.parse(arr)
+
+    console.log(id)
+
+    if (!arr || !Array.isArray(studentsGroup))
+      throw new Error('Datos indefinidos')
+
+    const groupClass = await users.createStudents(id, studentsGroup)
+
+    res.json({
+      message: 'Class created',
+      ok: true,
+      data: {
+        class: groupClass
+      }
+    })
+  } catch (error) {
+    res.status(error.status || 400).send({
+      message: 'Something went wrong',
+      error: error.message || 'Error: Please contact your System Administrator'
+    })
+  }
+})
+
+// POST users/students/login
+router.post('/students/login', async (req, res) => {
+  try {
+    const { user, password } = req.body
+
+    const userResponse = await users.login({ user, email, password })
+
+    res.status(200).send({
+      message: 'Login Successful',
+      data: {
+        userResponse
+      }
+    })
+  } catch (error) {
+    res.status(error.status || 400).send({
+      message: 'Something went wrong',
+      error: error.message || 'Error: Please contact your System Administrator'
+    })
+  }
+})
+
+// GET users/role
+router.get('/role/users', validUser, async (req, res) => {
+  try {
+    const id = req.user._id
+
+    const role = await users.getRoleById(id)
+
+    res.status(200).send({
+      message: 'Login Successful',
+      ok: true,
+      role
+    })
+  } catch (error) {
+    res.status(error.status || 400).send({
+      message: 'Something went wrong',
+      error: error.message || 'Error: Please contact your System Administrator'
+    })
+  }
+})
+
 export default router

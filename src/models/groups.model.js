@@ -34,11 +34,11 @@ const groupsSchema = new Schema({
     maxlength: [10, 'La cantidad de caracteres excede los requeridos (10)'],
     required: [true, 'La descripción es obligatoria']
   },
-  /*teacher: {
+  teacher: {
     type: Types.ObjectId,
-    ref: 'teachers',
+    ref: 'users',
     required: [true, 'El profesor es obligatorio']
-  },*/
+  },
   status: {
     type: Boolean,
     default: false

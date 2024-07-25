@@ -1,42 +1,24 @@
 import express from 'express'
 import groups from '../use-cases/groups.use-cases.js'
+import validUser from '../middlewares/userauth.js'
 
 const router = express.Router()
 
-// GET /groups
-router.get('/', async (request, response) => {
-  try {
-    const allGroups = await groups.getAll()
-
-    response.json({
-      message: 'All students',
-      ok: true,
-      data: {
-        students: allGroups
-      }
-    })
-  } catch (error) {
-    response.status(500).json({
-      message: 'Something went wrong',
-      error: error.message
-    })
-  }
-})
-
 // GET /groups/:id
-router.get('/:id', async (request, response) => {
+router.get('/', validUser, async (request, response) => {
   try {
-    const { id } = request.params
-    const group = await groups.getById(id)
+    const id = request.user._id
+    const group = await groups.getByProfesor(id)
 
     response.json({
       message: 'Group found',
       ok: true,
       data: {
-        group: group
+        group
       }
     })
   } catch (error) {
+    console.log(error)
     response.status(500).json({
       message: 'Something went wrong',
       error: error.message
@@ -45,9 +27,12 @@ router.get('/:id', async (request, response) => {
 })
 
 // POST /groups
-router.post('/', async (request, response) => {
+router.post('/', validUser, async (request, response) => {
   try {
-    const group = await groups.create(request.body)
+    const id = request.user._id
+
+    const group = await groups.create(id, request.body)
+    console.log(group)
 
     response.json({
       message: 'Group Created',
