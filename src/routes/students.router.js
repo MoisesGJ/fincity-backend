@@ -1,21 +1,20 @@
 import express from 'express'
 import students from '../use-cases/students.use-cases.js'
+import validUser from '../middlewares/userauth.js'
 
 const router = express.Router()
 
 // GET /students
-router.get('/', async (request, response) => {
+router.get('/', validUser, async (request, response) => {
   try {
-    const allStudents = await students.getAll()
+    const id = request.user._id
+    const newstudents = await students.getByProfesor(id)
 
-    response.json({
-      message: 'All students',
-      ok: true,
-      data: {
-        students: allStudents
-      }
-    })
+    const studentsStr = JSON.stringify(newstudents)
+
+    response.send(studentsStr)
   } catch (error) {
+    console.log(error)
     response.status(500).json({
       message: 'Something went wrong',
       error: error.message

@@ -1,8 +1,13 @@
 import express from 'express'
+import { fileURLToPath } from 'url'
+
 import users from '../use-cases/users.use-cases.js'
 
 import validTokenEmailMiddleware from '../middlewares/emailValidate.js'
 import validUser from '../middlewares/userauth.js'
+
+import path from 'path'
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const router = express.Router()
 
@@ -237,7 +242,7 @@ router.post('/students', express.text(), validUser, async (req, res) => {
     const arr = req.body
     const studentsGroup = JSON.parse(arr)
 
-    console.log(id)
+    console.log(studentsGroup)
 
     if (!arr || !Array.isArray(studentsGroup))
       throw new Error('Datos indefinidos')
@@ -252,6 +257,7 @@ router.post('/students', express.text(), validUser, async (req, res) => {
       }
     })
   } catch (error) {
+    console.log(error.message)
     res.status(error.status || 400).send({
       message: 'Something went wrong',
       error: error.message || 'Error: Please contact your System Administrator'
@@ -292,6 +298,17 @@ router.get('/role/users', validUser, async (req, res) => {
       ok: true,
       role
     })
+  } catch (error) {
+    res.status(error.status || 400).send({
+      message: 'Something went wrong',
+      error: error.message || 'Error: Please contact your System Administrator'
+    })
+  }
+})
+
+router.get('/file/students', async (req, res) => {
+  try {
+    res.sendFile(path.join(__dirname, '../public/files', 'example_fincity.csv'))
   } catch (error) {
     res.status(error.status || 400).send({
       message: 'Something went wrong',

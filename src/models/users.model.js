@@ -41,23 +41,20 @@ const userSchema = new Schema(
       minLength: [8, 'Password must be at least 8 characters long'],
       trim: true
     },
-    role: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'roles',
-        required: [true, 'Role is required'],
-        validate: {
-          validator: async function (roleId) {
-            const role = await Role.findById(roleId)
-            return !!role
-          },
-          message: 'Role does not exist'
-        }
+    role: {
+      type: Schema.Types.ObjectId,
+      ref: 'roles',
+      required: [true, 'Role is required'],
+      validate: {
+        validator: async function (roleId) {
+          const role = await Role.findById(roleId)
+          return !!role
+        },
+        message: 'Role does not exist'
       }
-    ],
+    },
     googleId: {
       type: String,
-      unique: true,
       trim: true
     }
   },
@@ -86,6 +83,10 @@ userSchema.index(
 userSchema.index(
   { email: 1 },
   { unique: true, partialFilterExpression: { email: { $type: 'string' } } }
+)
+userSchema.index(
+  { googleId: 1 },
+  { unique: true, partialFilterExpression: { googleId: { $type: 'string' } } }
 )
 
 userSchema.pre('save', async function (next) {
