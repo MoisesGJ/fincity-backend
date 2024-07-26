@@ -10,6 +10,7 @@ import purchaseItemRoutes from './src/routes/purchases-items.router.js'
 import groupsRoutes from './src/routes/groups.router.js'
 import schoolsRoutes from './src/routes/schools.router.js'
 import studentsTasksRoutes from './src/routes/students-tasks.router.js'
+import googleAuthRoutes from './src/routes/google.router.js'
 
 dotenv.config()
 
@@ -32,6 +33,7 @@ app.use('/items/purchases', purchaseItemRoutes)
 app.use('/groups', groupsRoutes)
 app.use('/schools', schoolsRoutes)
 app.use('/students-tasks', studentsTasksRoutes)
+app.use('/google/auth', googleAuthRoutes)
 
 /**
  * Start application

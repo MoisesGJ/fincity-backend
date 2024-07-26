@@ -29,8 +29,8 @@ const StudentSchema = new Schema({
       },
       message: 'Student does not exist'
     }
-  },
-  parent: {
+  }
+  /*parent: {
     type: Types.ObjectId,
     ref: 'User',
     required: [true, 'El padre es obligatorio'],
@@ -52,7 +52,7 @@ const StudentSchema = new Schema({
       },
       message: 'Avatar does not exist'
     }
-  }
+  }*/
 })
 
 const Student = mongoose.model('students', StudentSchema)

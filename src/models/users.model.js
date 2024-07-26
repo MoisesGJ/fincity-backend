@@ -10,37 +10,30 @@ const userSchema = new Schema(
     user: {
       type: String,
       maxLength: [10, 'User cannot have more than 10 characters'],
-      unique: true,
-      trim: true,
-      default: null
+      trim: true
     },
     first_name: {
       type: String,
       required: [true, 'First Name is required'],
-      match: [
-        /^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$/,
-        'First Name can only contain letters and spaces.'
-      ],
+
       maxLength: [50, 'First Name cannot have more than 50 characters'],
       trim: true
     },
     last_name: {
       type: String,
       required: [true, 'Last Name is required'],
-      match: [
-        /^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$/,
-        'Last Name can only contain letters and spaces.'
-      ],
       maxLength: [50, 'Last Name cannot have more than 50 characters'],
       trim: true
     },
     email: {
       type: String,
-      required: [true, 'Email is required'],
-      unique: true,
       match: [/\S+@\S+\.\S+/, 'Email is invalid'],
       lowercase: true,
       trim: true
+    },
+    emailVerified: {
+      type: Boolean,
+      default: false
     },
     password: {
       type: String,
@@ -50,7 +43,7 @@ const userSchema = new Schema(
     },
     role: {
       type: Schema.Types.ObjectId,
-      ref: 'Role',
+      ref: 'roles',
       required: [true, 'Role is required'],
       validate: {
         validator: async function (roleId) {
@@ -62,14 +55,7 @@ const userSchema = new Schema(
     },
     googleId: {
       type: String,
-      unique: true,
-      trim: true,
-      sparse: true
-    },
-    googleToken: {
-      type: String,
-      trim: true,
-      sparse: true
+      trim: true
     }
   },
   {
@@ -90,7 +76,18 @@ const userSchema = new Schema(
   }
 )
 
-userSchema.index({ user: 1, email: 1 }, { unique: true })
+userSchema.index(
+  { user: 1 },
+  { unique: true, partialFilterExpression: { user: { $type: 'string' } } }
+)
+userSchema.index(
+  { email: 1 },
+  { unique: true, partialFilterExpression: { email: { $type: 'string' } } }
+)
+userSchema.index(
+  { googleId: 1 },
+  { unique: true, partialFilterExpression: { googleId: { $type: 'string' } } }
+)
 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next()
@@ -100,6 +97,13 @@ userSchema.pre('save', async function (next) {
   } catch (error) {
     next(error)
   }
+})
+
+userSchema.pre('save', async function (next) {
+  if (!this.user && !this.email) {
+    next(new Error('Either User or Email must be provided'))
+  }
+  next()
 })
 
 userSchema.methods.toJSON = function () {
