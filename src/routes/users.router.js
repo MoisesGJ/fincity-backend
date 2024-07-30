@@ -1,3 +1,5 @@
+import createError from 'http-errors'
+
 import express from 'express'
 import { fileURLToPath } from 'url'
 
@@ -12,12 +14,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const router = express.Router()
 
 // GET /users/id
-router.get('/:id', async (request, response) => {
+router.get('/:id', async (request, res) => {
   try {
     const { id } = request.params
     const user = await users.getById(id)
 
-    response.json({
+    res.json({
       message: 'User found',
       ok: true,
       data: {
@@ -25,50 +27,45 @@ router.get('/:id', async (request, response) => {
       }
     })
   } catch (error) {
-    response.status(500).json({
+    res.status(error.status || 400).send({
       message: 'Something went wrong',
-      error: error.message
+      error: error.message || 'Error: Please contact your System Administrator'
     })
   }
 })
 
 // GET /users/email
-router.get('/email/:email', async (request, response) => {
+router.get('/email/:email', async (request, res) => {
   try {
     const userData = request.params
     const user = await users.getByEmail(userData.email)
 
-    if (user) {
-      response.json({
-        message: 'Users exists',
-        ok: true,
-        data: {
-          user
-        }
-      })
-    } else {
-      response.json({
-        message: 'User doesnt exists',
-        ok: false
-      })
-    }
+    if (!user) throw new createError(400, 'El correo no está vinculado')
+
+    res.json({
+      message: 'Users exists',
+      ok: true,
+      data: {
+        user
+      }
+    })
   } catch (error) {
-    response.status(500).json({
+    res.status(error.status || 400).send({
       message: 'Something went wrong',
-      error: error.message
+      error: error.message || 'Error: Please contact your System Administrator'
     })
   }
 })
 
 // GET /users/access-token/
-router.get('/access-token/:accessToken', async (request, response) => {
+router.get('/access-token/:accessToken', async (request, res) => {
   try {
     const { accessToken } = request.params
 
     const user = await users.getByAccessToken(accessToken)
 
     if (user) {
-      response.json({
+      res.json({
         message: 'Users exists',
         ok: true,
         data: {
@@ -76,21 +73,21 @@ router.get('/access-token/:accessToken', async (request, response) => {
         }
       })
     } else {
-      response.json({
+      res.json({
         message: 'User doesnt exists',
         ok: false
       })
     }
   } catch (error) {
-    response.status(500).json({
+    res.status(error.status || 400).send({
       message: 'Something went wrong',
-      error: error.message
+      error: error.message || 'Error: Please contact your System Administrator'
     })
   }
 })
 
 // POST /users
-router.post('/', async (request, response) => {
+router.post('/', async (request, res) => {
   try {
     const userData = request.body
 
@@ -99,8 +96,8 @@ router.post('/', async (request, response) => {
 
     console.log({ ...newUser, token: token })
 
-    response.status(201)
-    response.json({
+    res.status(201)
+    res.json({
       message: 'User created',
       ok: true,
       data: {
@@ -108,39 +105,37 @@ router.post('/', async (request, response) => {
       }
     })
   } catch (error) {
-    response.status(error.name === 'ValidationError' ? 400 : 500)
-
-    response.json({
+    res.status(error.status || 400).send({
       message: 'Something went wrong',
-      error: error.message
+      error: error.message || 'Error: Please contact your System Administrator'
     })
   }
 })
 
 //PATCH /user/id
 
-router.patch('/google/:id', async (request, response) => {
+router.patch('/google/:id', async (request, res) => {
   try {
     const newdata = request.body
     const { id } = request.params
 
     if (!newdata || Object.keys(newdata).length === 0) {
-      return response.status(400).json({
+      return res.status(400).json({
         message: 'No data to update'
       })
     }
 
     const user = await users.update(id, newdata, { new: true })
 
-    response.json({
+    res.json({
       message: `User updated`,
       ok: true,
       data: { user }
     })
   } catch (error) {
-    response.status(error.status || 500).json({
-      message: 'something went wrong',
-      error: error.message
+    res.status(error.status || 400).send({
+      message: 'Something went wrong',
+      error: error.message || 'Error: Please contact your System Administrator'
     })
   }
 })
@@ -173,12 +168,8 @@ router.get('/validate/verify/:id', async (req, res) => {
 
     const user = await users.getById(id)
 
-    if (!user.emailVerified) {
-      return res.status(200).send({
-        message: 'Email not validate',
-        ok: false
-      })
-    }
+    if (!user.emailVerified)
+      throw new createError(400, 'Email no está verificado')
 
     res.status(200).send({
       message: 'Email validate',
@@ -241,14 +232,12 @@ router.post('/students', express.text(), validUser, async (req, res) => {
     const arr = req.body
     const studentsGroup = JSON.parse(arr)
 
-    console.log(studentsGroup)
-
     if (!arr || !Array.isArray(studentsGroup))
-      throw new Error('Datos indefinidos')
+      throw new createError(400, 'Datos indefinidos')
 
     const groupClass = await users.createStudents(id, studentsGroup)
 
-    console.log(groupClass)
+    if (groupClass.length == 0) throw new createError(400, 'Error al crear')
 
     res.json({
       message: 'Class created',
