@@ -173,6 +173,8 @@ function generatePassword(firstName, lastName) {
 async function createStudents(id, studentsGroup) {
   const group = await Group.findOne({ teacher: id })
 
+  if (!group) throw new createError(400, 'El grupo no existe')
+
   const users = await Promise.all(
     studentsGroup.map(async ({ first_name, last_name }) => {
       const newUser = {
@@ -186,7 +188,7 @@ async function createStudents(id, studentsGroup) {
 
       const user = await User.create(newUser)
 
-      if (!user) throw new Error()
+      if (!user) throw new Error('Error al crear un nuevo usuario')
 
       return user
     })
