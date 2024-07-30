@@ -196,10 +196,9 @@ router.get('/validate/verify/:id', async (req, res) => {
 
 router.post('/send-email', validUser, async (req, res) => {
   try {
-    const { baseUrl } = req.body
     const { user } = req
 
-    const email = await users.sendEmail(baseUrl, user._id)
+    const email = await users.sendEmail(user._id)
 
     res.status(200).send({
       message: 'Email sended',
@@ -248,6 +247,8 @@ router.post('/students', express.text(), validUser, async (req, res) => {
       throw new Error('Datos indefinidos')
 
     const groupClass = await users.createStudents(id, studentsGroup)
+
+    console.log(groupClass)
 
     res.json({
       message: 'Class created',
