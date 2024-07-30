@@ -125,20 +125,20 @@ async function validate(id) {
   if (user) return await update(id, { emailVerified: true })
 }
 
-async function magicLink(baseUrl, idUser) {
+async function magicLink(idUser) {
   const token = JWT.generateAccessToken(idUser)
 
-  return `${baseUrl}/auth/verification/${token}`
+  return `${process.env.URL_EMAIL}/${token}`
 }
 
-async function sendEmail(baseUrl, idUser) {
+async function sendEmail(idUser) {
   const userToEmail = await getById(idUser)
 
   if (userToEmail.emailVerified) throw new Error('El correo ya está validado')
 
   const resend = new Resend(process.env.EMAIL_RESEND_API)
 
-  const link = await magicLink(baseUrl, idUser)
+  const link = await magicLink(idUser)
 
   const { data, error } = await resend.emails.send({
     from: `FinCity <${process.env.EMAIL_RESEND_FROM}>`,
@@ -192,13 +192,24 @@ async function createStudents(id, studentsGroup) {
     })
   )
 
-  const usersStudents = users.map(({ _id }) => {
-    return { student: _id, group: group._id }
-  })
+  const usersStudents = await Promise.all(
+    users.map(async ({ _id }) => {
+      const student = await Student.create({
+        student: _id,
+        group: group._id
+      })
 
-  const students = await Student.insertMany(usersStudents)
+      const find = await Student.findById(student._id).populate('student')
 
-  return students
+      return {
+        _id: find._id,
+        first_name: find.student.first_name,
+        last_name: find.student.last_name
+      }
+    })
+  )
+
+  return usersStudents
 }
 
 async function getRoleById(id) {
