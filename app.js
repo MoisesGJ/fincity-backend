@@ -11,6 +11,7 @@ import groupsRoutes from './src/routes/groups.router.js'
 import schoolsRoutes from './src/routes/schools.router.js'
 import studentsTasksRoutes from './src/routes/students-tasks.router.js'
 import googleAuthRoutes from './src/routes/google.router.js'
+import tutorRoutes from './src/routes/tutor.router.js'
 
 dotenv.config()
 
@@ -34,6 +35,7 @@ app.use('/groups', groupsRoutes)
 app.use('/schools', schoolsRoutes)
 app.use('/students-tasks', studentsTasksRoutes)
 app.use('/google/auth', googleAuthRoutes)
+app.use('/tutor', tutorRoutes)
 
 /**
  * Start application

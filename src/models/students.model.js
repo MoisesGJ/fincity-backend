@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import User from './users.model.js'
 import Group from './groups.model.js'
 import Avatar from './avatars.model.js'
+import Tutor from './tutors.model.js'
 
 const { Schema, Types } = mongoose
 
@@ -29,20 +30,20 @@ const StudentSchema = new Schema({
       },
       message: 'Student does not exist'
     }
-  }
-  /*parent: {
+  },
+  parent: {
     type: Types.ObjectId,
-    ref: 'User',
+    ref: 'Tutor',
     required: [true, 'El padre es obligatorio'],
     validate: {
       validator: async function (parentId) {
-        const parent = await User.findById(parentId)
+        const parent = await Tutor.findById(parentId)
         return !!parent
       },
       message: 'Parent does not exist'
     }
-  },
-  avatar: {
+  }
+  /* avatar: {
     type: Types.ObjectId,
     ref: 'Avatar',
     validate: {
