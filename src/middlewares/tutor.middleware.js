@@ -1,33 +1,32 @@
 import jwt from 'jsonwebtoken'
 
-export default async function validUser(req, res, next) {
+export default async function validTokenEmail(req, res, next) {
   try {
     const { authorization } = req.headers
 
     if (!authorization) {
       return res.status(401).send({
         error: {
-          message: 'No auth provider'
+          message: 'Necesitas enviar un token'
         }
       })
     }
 
     const token = authorization.split(' ')[1]
-    jwt.verify(token, process.env.JWT_SIGN, (err, payload) => {
+    jwt.verify(token, process.env.TOKEN_EMAIL_SECRET, (err, payload) => {
       if (err) {
         return res.status(403).json({
-          expireSess: true,
           error: {
-            message: 'Invalid auth'
+            message: 'El token no es válido'
           }
         })
       } else {
-        req.user = payload
+        req.parent = payload
+
         next()
       }
     })
   } catch (error) {
-    console.log(error)
     const tokenError = new Error(error)
 
     res.status(400).send({

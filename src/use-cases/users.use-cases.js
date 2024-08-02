@@ -1,13 +1,11 @@
 import User from '../models/users.model.js'
 import mongoose from 'mongoose'
 import createError from 'http-errors'
-import { Resend } from 'resend'
 
-import JWT from '../lib/jsonwebtoken.js'
-import templateHtml from '../lib/email/email-template.html.js'
-import Group from '../models/groups.model.js'
-import Student from '../models/students.model.js'
+import generateAccessToken from '../lib/jsonwebtoken.js'
+import templateHtml from '../lib/email/templates/email.template.html.js'
 import Role from '../models/roles.model.js'
+import Email from '../lib/email/sendEmail.js'
 
 async function createToken(id, name) {
   return await User.createToken({
@@ -125,101 +123,32 @@ async function validate(id) {
   if (user) return await update(id, { emailVerified: true })
 }
 
-async function magicLink(idUser) {
-  const token = JWT.generateAccessToken(idUser)
-
-  return `${process.env.URL_EMAIL}/${token}`
-}
-
-async function sendEmail(idUser) {
-  const userToEmail = await getById(idUser)
-
-  if (userToEmail.emailVerified) throw new Error('El correo ya está validado')
-
-  const resend = new Resend(process.env.EMAIL_RESEND_API)
-
-  const link = await magicLink(idUser)
-
-  const { data, error } = await resend.emails.send({
-    from: `FinCity <${process.env.EMAIL_RESEND_FROM}>`,
-    to: [userToEmail.email],
-    subject: 'Empieza por aquí...',
-    html: templateHtml(link)
-  })
-
-  if (error) {
-    throw new Error({ error: error.message })
-  }
-
-  return data
-}
-
-function createUser(fn, ln) {
-  return `${fn.slice(0, 3)}${ln.slice(0, 3)}`.toLowerCase()
-}
-function generatePassword(firstName, lastName) {
-  const firstPart = firstName.slice(0, 3)
-  const lastPart = lastName.slice(0, 3)
-
-  const randomNumber = Math.floor(100 + Math.random() * 900) // 100-999
-
-  const password = `${firstPart}${lastPart}${randomNumber}`
-
-  //return password
-
-  return `${firstName.slice(0, 4)}${lastName.slice(0, 4)}`.toLowerCase()
-}
-
-async function createStudents(id, studentsGroup) {
-  const group = await Group.findOne({ teacher: id })
-
-  if (!group) throw new createError(400, 'El grupo no existe')
-
-  const users = await Promise.all(
-    studentsGroup.map(async ({ first_name, last_name }) => {
-      const newUser = {
-        role: '6676ee2f23f3b664bbf5f50c',
-        user: createUser(first_name, last_name),
-        password: generatePassword(first_name, last_name),
-        first_name,
-        last_name,
-        group: group._id
-      }
-
-      const user = await User.create(newUser)
-
-      if (!user) throw new Error('Error al crear un nuevo usuario')
-
-      return user
-    })
-  )
-
-  const usersStudents = await Promise.all(
-    users.map(async ({ _id }) => {
-      const student = await Student.create({
-        student: _id,
-        group: group._id
-      })
-
-      const find = await Student.findById(student._id).populate('student')
-
-      return {
-        _id: find._id,
-        first_name: find.student.first_name,
-        last_name: find.student.last_name
-      }
-    })
-  )
-
-  return usersStudents
-}
-
 async function getRoleById(id) {
   const { role } = await User.findById(id)
 
   const { description } = await Role.findById(role)
 
   return description
+}
+
+async function sendEmail(idUser) {
+  const userToEmail = await getById(idUser)
+
+  if (userToEmail.emailVerified)
+    throw new createError(400, 'El correo ya está validado')
+
+  //Link
+  const token = generateAccessToken({ idUser }, '5m')
+
+  const link = `${process.env.URL_EMAIL}/${token}`
+
+  const email = await Email(
+    [userToEmail.email],
+    'Empieza por aquí...',
+    templateHtml(link)
+  )
+
+  return email
 }
 
 export default {
@@ -234,6 +163,5 @@ export default {
   login,
   validate,
   sendEmail,
-  createStudents,
   getRoleById
 }

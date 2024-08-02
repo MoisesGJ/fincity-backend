@@ -5,8 +5,8 @@ import { fileURLToPath } from 'url'
 
 import users from '../use-cases/users.use-cases.js'
 
-import validTokenEmailMiddleware from '../middlewares/emailValidate.js'
-import validUser from '../middlewares/userauth.js'
+import validTokenEmailMiddleware from '../middlewares/email.middleware.js'
+import validUser from '../middlewares/user.middleware.js'
 
 import path from 'path'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -217,37 +217,6 @@ router.post('/validate-email', validTokenEmailMiddleware, async (req, res) => {
       ok: true
     })
   } catch (error) {
-    res.status(error.status || 400).send({
-      message: 'Something went wrong',
-      error: error.message || 'Error: Please contact your System Administrator'
-    })
-  }
-})
-
-// # CREATE
-// POST users/students/
-router.post('/students', express.text(), validUser, async (req, res) => {
-  try {
-    const id = req.user._id
-    const arr = req.body
-    const studentsGroup = JSON.parse(arr)
-
-    if (!arr || !Array.isArray(studentsGroup))
-      throw new createError(400, 'Datos indefinidos')
-
-    const groupClass = await users.createStudents(id, studentsGroup)
-
-    if (groupClass.length == 0) throw new createError(400, 'Error al crear')
-
-    res.json({
-      message: 'Class created',
-      ok: true,
-      data: {
-        class: groupClass
-      }
-    })
-  } catch (error) {
-    console.log(error.message)
     res.status(error.status || 400).send({
       message: 'Something went wrong',
       error: error.message || 'Error: Please contact your System Administrator'

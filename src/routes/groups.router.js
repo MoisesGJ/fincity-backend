@@ -1,6 +1,6 @@
 import express from 'express'
 import groups from '../use-cases/groups.use-cases.js'
-import validUser from '../middlewares/userauth.js'
+import validUser from '../middlewares/user.middleware.js'
 
 const router = express.Router()
 
